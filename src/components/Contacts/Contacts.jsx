@@ -1,20 +1,32 @@
 import React from 'react';
 import css from './Contacts.module.css';
 
-// bibliothecs
-import PropTypes from 'prop-types';
-
 // components
 import { ContactsItem } from 'components/ContactsItem/ContactsItem';
 
-export const Contacts = ({ renderContacts }) => {
+export const Contacts = ({ onDeleteContact, contacts, filter }) => {
+  const renderContacts = () => {
+    if (!filter) {
+      return contacts;
+    }
+    const normalizedFilter = filter.toLowerCase();
+    return contacts.filter(({ name }) =>
+      name.toLowerCase().includes(normalizedFilter),
+    );
+  };
+
   return (
     <ul className={css.contactsList}>
-      <ContactsItem renderContacts={renderContacts} />
+      {renderContacts().map(({ id, name, number }) => (
+        <ContactsItem
+          key={id}
+          id={id}
+          name={name}
+          number={number}
+          filter={filter}
+          onDelete={onDeleteContact}
+        />
+      ))}
     </ul>
   );
-};
-
-Contacts.propTypes = {
-  renderContacts: PropTypes.func.isRequired,
 };

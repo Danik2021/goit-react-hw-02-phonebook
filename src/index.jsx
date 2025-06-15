@@ -2,15 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 
-// bibliothecs
+// libraries
 import { nanoid } from 'nanoid';
 
-// methods
-
-import { getFilteredContacts } from 'components/getFilteredContacts/getFilteredContacts';
-
 // components
-import { Section } from 'components/Section/Section';
+import { Phonebook } from 'components/Phonebook/Phonebook';
+import { Contacts } from 'components/Contacts/Contacts';
+import { Filter } from 'components/Filter/Filter';
 
 class App extends React.Component {
   state = {
@@ -24,15 +22,25 @@ class App extends React.Component {
   };
 
   onTypeName = e => {
-    this.setState({
-      name: e.target.value,
-    });
+    this.setState(
+      {
+        name: e.target.value,
+      },
+      () => {
+        console.log('Name typed:', this.state.name);
+      },
+    );
   };
 
   onTypeNumber = e => {
-    this.setState({
-      number: e.target.value,
-    });
+    this.setState(
+      {
+        number: e.target.value,
+      },
+      () => {
+        console.log('Number typed:', this.state.number);
+      },
+    );
   };
 
   onFilterChange = e => {
@@ -43,50 +51,53 @@ class App extends React.Component {
 
   addContact = e => {
     e.preventDefault();
-    const { name, number } = this.state;
+    const { name: newContactName, number, contacts } = this.state;
+    console.log('Adding contact:', { newContactName, number });
+
+    if (
+      contacts.some(
+        ({ name }) => newContactName.toLowerCase() === name.toLowerCase(),
+      )
+    ) {
+      alert(`${newContactName} is already in contacts.`);
+      return;
+    }
 
     const newContact = {
       id: nanoid(),
-      name: name,
+      name: newContactName,
       number: number,
     };
-
-    this.setState(
-      ({ contacts }) => {
-        return {
-          contacts: [...contacts, newContact],
-        };
-      },
-      () => {
-        console.log(this.state);
-      },
-    );
+    this.setState(({ contacts }) => {
+      return {
+        contacts: [...contacts, newContact],
+      };
+    });
   };
 
-  renderContacts = () => {
-    const filtredContacts = getFilteredContacts(this.state);
-    return (
-      <>
-        {filtredContacts.map(({ name, id, number }) => {
-          return (
-            <li key={id}>
-              {name}: {number}
-            </li>
-          );
-        })}
-      </>
-    );
+  onDeleteContact = idToDelete => {
+    this.setState(({ contacts }) => ({
+      contacts: contacts.filter(({ id }) => id !== idToDelete),
+    }));
   };
 
   render() {
     return (
-      <Section
-        onTypeName={this.onTypeName}
-        onTypeNumber={this.onTypeNumber}
-        addContact={this.addContact}
-        onFilterChange={this.onFilterChange}
-        renderContacts={this.renderContacts}
-      />
+      <>
+        <h1>Phonebook</h1>
+        <Phonebook
+          onTypeName={this.onTypeName}
+          onTypeNumber={this.onTypeNumber}
+          addContact={this.addContact}
+        />
+        <h2>Contacts</h2>
+        <Filter onFilterChange={this.onFilterChange} />
+        <Contacts
+          onDeleteContact={this.onDeleteContact}
+          contacts={this.state.contacts}
+          filter={this.state.filter}
+        />
+      </>
     );
   }
 }
@@ -95,8 +106,6 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
   <React.StrictMode>
-    <>
-      <App />
-    </>
+    <App />
   </React.StrictMode>,
 );
