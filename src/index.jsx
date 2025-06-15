@@ -22,25 +22,15 @@ class App extends React.Component {
   };
 
   onTypeName = e => {
-    this.setState(
-      {
-        name: e.target.value,
-      },
-      () => {
-        console.log('Name typed:', this.state.name);
-      },
-    );
+    this.setState({
+      name: e.target.value,
+    });
   };
 
   onTypeNumber = e => {
-    this.setState(
-      {
-        number: e.target.value,
-      },
-      () => {
-        console.log('Number typed:', this.state.number);
-      },
-    );
+    this.setState({
+      number: e.target.value,
+    });
   };
 
   onFilterChange = e => {
@@ -52,7 +42,6 @@ class App extends React.Component {
   addContact = e => {
     e.preventDefault();
     const { name: newContactName, number, contacts } = this.state;
-    console.log('Adding contact:', { newContactName, number });
 
     if (
       contacts.some(
